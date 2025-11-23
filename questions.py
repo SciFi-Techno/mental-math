@@ -5,6 +5,7 @@ class Questions(QtWidgets.QMainWindow):
     def __init__(self, topic, difficulty):
         super().__init__()
         self.level = difficulty
+        self.operation = topic
 
         # Set window size & title
         self.setWindowTitle("Questions")
@@ -28,20 +29,20 @@ class Questions(QtWidgets.QMainWindow):
         self.n2_label.setFont(QtGui.QFont("Arial", 24))
 
         # Set & display the actual question
-        self.topic_symbol = None
-        if topic == 0:
-            self.topic_symbol = QtWidgets.QLabel("+")
-        elif topic == 1:
-            self.topic_symbol = QtWidgets.QLabel("-")
-        elif topic == 2:
-            self.topic_symbol = QtWidgets.QLabel("*")
-        self.topic_symbol.setFont(QtGui.QFont("Arial", 24))
+        topic_symbol = None
+        if self.operation == 0:
+            topic_symbol = QtWidgets.QLabel("+")
+        elif self.operation == 1:
+            topic_symbol = QtWidgets.QLabel("-")
+        elif self.operation == 2:
+            topic_symbol = QtWidgets.QLabel("*")
+        topic_symbol.setFont(QtGui.QFont("Arial", 24))
 
         self.equals = QtWidgets.QLabel("=")
         self.equals.setFont(QtGui.QFont("Arial", 24))
 
         self.second_layout.addWidget(self.n1_label)
-        self.second_layout.addWidget(self.topic_symbol)
+        self.second_layout.addWidget(topic_symbol)
         self.second_layout.addWidget(self.n2_label)
         self.second_layout.addWidget(self.equals)
 
@@ -66,11 +67,11 @@ class Questions(QtWidgets.QMainWindow):
     def submit_answer(self, user_input):
         answer = None
 
-        if self.topic_symbol == "+":
+        if self.operation == 0:
             answer = self.no1 + self.no2
-        elif self.topic_symbol == "-":
+        elif self.operation == 1:
             answer = self.no1 - self.no2
-        elif self.topic_symbol == "*":
+        elif self.operation == 2:
             answer = self.no1 * self.no2
 
         if user_input == answer:
