@@ -10,12 +10,15 @@ class Timer(QtWidgets.QInputDialog):
 
         # Set what input is accepted & the label text
         self.setInputMode(QtWidgets.QInputDialog.InputMode.IntInput)
-        self.setLabelText("Total Session Length (in Minutes):")
+        self.setLabelText("Total Session Length (in seconds):")
 
         self.intValueSelected.connect(self.user_input)
         self.custom_time = 0
 
         self.exec()
 
-    def user_input(self, minutes):
-        self.custom_time = minutes
+    def user_input(self, seconds):
+        self.custom_time = seconds
+
+    def get_time(self):
+        return self.custom_time

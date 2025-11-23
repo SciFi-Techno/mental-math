@@ -1,23 +1,26 @@
-from PySide6 import QtWidgets, QtGui
+from PySide6 import QtWidgets, QtGui, QtCore
 import random
 
 class Questions(QtWidgets.QMainWindow):
-    def __init__(self, topic, difficulty):
+    def __init__(self, topic, difficulty, time):
         super().__init__()
         self.level = difficulty
         self.operation = topic
+        self.time_remain = time
 
         # Set window size & title
         self.setWindowTitle("Questions")
-        self.setFixedSize(1000, 500)
+        self.setFixedSize(900, 300)
 
         # Set overall page layout
         main_layout = QtWidgets.QVBoxLayout()
-        self.second_layout = QtWidgets.QHBoxLayout()
-        third_layout = QtWidgets.QHBoxLayout()
+        second_layout = QtWidgets.QHBoxLayout()
+        self.third_layout = QtWidgets.QHBoxLayout()
+        fourth_layout = QtWidgets.QHBoxLayout()
 
-        main_layout.addLayout(self.second_layout)
-        main_layout.addLayout(third_layout)
+        main_layout.addLayout(second_layout)
+        main_layout.addLayout(self.third_layout)
+        main_layout.addLayout(fourth_layout)
 
         # Numbers & their associated label for the problems
         self.no1 = None
@@ -41,20 +44,30 @@ class Questions(QtWidgets.QMainWindow):
         self.equals = QtWidgets.QLabel("=")
         self.equals.setFont(QtGui.QFont("Arial", 24))
 
-        self.second_layout.addWidget(self.n1_label)
-        self.second_layout.addWidget(topic_symbol)
-        self.second_layout.addWidget(self.n2_label)
-        self.second_layout.addWidget(self.equals)
+        self.third_layout.addWidget(self.n1_label)
+        self.third_layout.addWidget(topic_symbol)
+        self.third_layout.addWidget(self.n2_label)
+        self.third_layout.addWidget(self.equals)
 
         # Set & display the input box
-        self.answer_box = QtWidgets.QInputDialog()
-        self.answer_box.setInputMode(QtWidgets.QInputDialog.InputMode.IntInput)
-        self.answer_box.setOption(QtWidgets.QInputDialog.InputDialogOption.NoButtons)
-        self.answer_box.setIntRange(-10000, 10000)
-        self.answer_box.intValueChanged.connect(self.submit_answer)
-        self.answer_box.setLabelText("")
+        answer_box = QtWidgets.QInputDialog()
+        answer_box.setInputMode(QtWidgets.QInputDialog.InputMode.IntInput)
+        answer_box.setOption(QtWidgets.QInputDialog.InputDialogOption.NoButtons)
+        answer_box.setIntRange(-10000, 10000)
+        answer_box.intValueChanged.connect(self.submit_answer)
+        answer_box.setLabelText("")
 
-        third_layout.addWidget(self.answer_box)
+        fourth_layout.addWidget(answer_box)
+
+        # Set & display the timer
+        self.time_given = QtCore.QTime(0, self.time_remain // 60, self.time_remain % 60)
+        self.timer_label = QtWidgets.QLabel(str(self.time_remain // 60) + ":" + str(self.time_remain % 60))
+        self.timer_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+        self.timer_label.setFont(QtGui.QFont("Arial", 24))
+        second_layout.addWidget(self.timer_label)
+        my_timer = QtCore.QTimer(self)
+        my_timer.timeout.connect(self.time_update)
+        my_timer.start(1000)
 
         # Main widget to display all elements
         main_widget = QtWidgets.QWidget()
@@ -89,3 +102,10 @@ class Questions(QtWidgets.QMainWindow):
         elif self.level == 2:
             self.no1 = random.randrange(100, 999)
             self.no2 = random.randrange(100, 999)
+
+    def time_update(self):
+        self.time_given = self.time_given.addSecs(-1)
+        self.timer_label.setText(str(self.time_given.minute()) + ":" + str(self.time_given.second()))
+
+        if self.time_given.minute() == 0 and self.time_given.second() == 0:
+            self.close()

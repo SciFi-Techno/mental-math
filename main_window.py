@@ -14,6 +14,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.new_window = None
         self.topic_selected = 0
         self.difficulty_selected = 0
+        self.timer = None
 
         # Set window size & title
         self.setWindowTitle("Mental Math")
@@ -103,14 +104,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def timer_state_change(self):
         if self.timer_checkbox.isChecked():
-            setting_timer.Timer()
+            self.timer = setting_timer.Timer()
 
     def problem_state_change(self):
         if self.problems_checkbox.isChecked():
             setting_problems.NumberOfProblems()
 
-    def start_button(self, toggled):
-        self.new_window = questions.Questions(self.topic_selected, self.difficulty_selected)
+    def start_button(self):
+        self.new_window = questions.Questions(self.topic_selected, self.difficulty_selected, self.timer.get_time())
 
         if not self.new_window:
             self.new_window = None
