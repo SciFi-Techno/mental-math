@@ -8,6 +8,7 @@ class Questions(QtWidgets.QMainWindow):
         self.operation = topic
         self.time_remain = time
         self.problems_remain = problems
+        self.score = 0
 
         # Set window size & title
         self.setWindowTitle("Questions")
@@ -59,22 +60,31 @@ class Questions(QtWidgets.QMainWindow):
         self.answer_box.editingFinished.connect(self.submit_answer)
         fourth_layout.addWidget(self.answer_box)
 
+        # Set the score label
+        self.score_label = QtWidgets.QLabel("Score: " + str(self.score))
+        self.score_label.setFont(QtGui.QFont("Arial", 24))
+
         # Set & display the timer if option was selected
         if self.time_remain != 0 and self.problems_remain == 0:
             self.time_given = QtCore.QTime(0, self.time_remain // 60, self.time_remain % 60)
             self.timer_label = QtWidgets.QLabel(str(self.time_remain // 60) + ":" + str(self.time_remain % 60))
-            self.timer_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+            self.timer_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
             self.timer_label.setFont(QtGui.QFont("Arial", 24))
+            self.score_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
             second_layout.addWidget(self.timer_label)
+            second_layout.addWidget(self.score_label)
             my_timer = QtCore.QTimer(self)
             my_timer.timeout.connect(self.time_update)
             my_timer.start(1000)
+
         # Set & display the number of problems remaining if option was selected
         elif self.problems_remain != 0 and self.time_remain == 0:
             self.problems_label = QtWidgets.QLabel(str(self.problems_remain))
-            self.problems_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+            self.problems_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
             self.problems_label.setFont(QtGui.QFont("Arial", 24))
+            self.score_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
             second_layout.addWidget(self.problems_label)
+            second_layout.addWidget(self.score_label)
 
         # Main widget to display all elements
         main_widget = QtWidgets.QWidget()
@@ -97,11 +107,15 @@ class Questions(QtWidgets.QMainWindow):
 
         if self.time_remain != 0 and self.problems_remain == 0:
             if (user_input == answer) and ((self.time_given.minute() != 0) and (self.time_given.second() != 0)):
+                self.score += 1
+                self.score_label.setText("Score: " + str(self.score))
                 self.difficulty_level()
                 self.n1_label.setText(str(self.no1))
                 self.n2_label.setText(str(self.no2))
         elif self.problems_remain != 0 and self.time_remain == 0:
             if (user_input == answer) and (self.problems_remain != 0):
+                self.score += 1
+                self.score_label.setText("Score: " + str(self.score))
                 self.difficulty_level()
                 self.n1_label.setText(str(self.no1))
                 self.n2_label.setText(str(self.no2))
