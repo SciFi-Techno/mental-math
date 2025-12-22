@@ -15,6 +15,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.topic_selected = 0
         self.difficulty_selected = 0
         self.timer = None
+        self.problems = None
 
         # Set window size & title
         self.setWindowTitle("Mental Math")
@@ -48,7 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
         topic_layout.addWidget(learning_label)
 
         self.learning_options = QtWidgets.QComboBox()
-        self.learning_options.addItems(["Addition", "Subtraction", "Multiplication", "Division", "Mix"])
+        self.learning_options.addItems(["Addition", "Subtraction", "Multiplication"])
         self.learning_options.currentIndexChanged.connect(self.topic_changed)
         topic_layout.addWidget(self.learning_options)
 
@@ -59,7 +60,7 @@ class MainWindow(QtWidgets.QMainWindow):
         difficulty_layout.addWidget(difficulty_label)
 
         self.difficulty_options = QtWidgets.QComboBox()
-        self.difficulty_options.addItems(["Easy", "Medium", "Hard", "Custom"])
+        self.difficulty_options.addItems(["Easy", "Medium", "Hard"])
         self.difficulty_options.currentIndexChanged.connect(self.difficulty_changed)
         difficulty_layout.addWidget(self.difficulty_options)
 
@@ -105,13 +106,32 @@ class MainWindow(QtWidgets.QMainWindow):
     def timer_state_change(self):
         if self.timer_checkbox.isChecked():
             self.timer = setting_timer.Timer()
+            if self.timer.get_time() == 0:
+                self.timer_checkbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
+        else:
+            self.timer = None
 
     def problem_state_change(self):
         if self.problems_checkbox.isChecked():
-            setting_problems.NumberOfProblems()
+            self.problems = setting_problems.NumberOfProblems()
+            if self.problems.get_number() == 0:
+                self.problems_checkbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
+        else:
+            self.problems = None
 
     def start_button(self):
-        self.new_window = questions.Questions(self.topic_selected, self.difficulty_selected, self.timer.get_time())
+        if self.timer is None:
+            self.new_window = questions.Questions(self.topic_selected, self.difficulty_selected, 0,
+                                              self.problems.get_number())
+        elif self.problems is None:
+            self.new_window = questions.Questions(self.topic_selected, self.difficulty_selected, self.timer.get_time(),
+                                                  0)
+        else:
+            warning = QtWidgets.QMessageBox()
+            warning.setWindowTitle("DO NOT ENTER!")
+            warning.setText("UNDER CONSTRUCTION!")
+            warning.setFixedSize(200, 150)
+            warning.exec()
 
         if not self.new_window:
             self.new_window = None
